@@ -1,36 +1,45 @@
 // core/useCases/productUseCases.js
-
-const Product = require('../entities/Product');
-const productRepository = require('../../data/repositories/productRepository');
+const { Op } = require('sequelize');
+const Product = require('../../models/products');
 
 async function getAllProducts() {
-  // Call the repository method to fetch all products
-  const productData = await productRepository.getAll();
-
-  // Map product data to Product entities
-  const products = productData.map(({ title, image, price, origin, size, type }) => 
-    new Product(title, image, price, origin, size, type)
-  );
-  return products;
+  try {
+    const products = await Product.findAll();
+    return products;
+  } catch (error) {
+    throw new Error(`Error fetching all products: ${error.message}`);
+  }
 }
 
 async function getFilteredProducts(name, origin, size, type) {
-  // Call the repository method to fetch all products
-  const productData = await productRepository.getAll();
+  try {
+    // Build the where clause dynamically based on provided parameters
+    const whereClause = {};
+    
+    if (name) {
+      whereClause.title = { [Op.iLike]: `%${name}%` };
+    }
+    if (origin) {
+      whereClause.origin = { [Op.iLike]: `%${origin}%` };
+    }
+    if (size) {
+      whereClause.size = { [Op.iLike]: `%${size}%` };
+    }
+    if (type) {
+      whereClause.type = { [Op.iLike]: `%${type}%` };
+    }
 
-  // Filter products based on query parameters
-  const products = productData
-    .filter(product => 
-      (!name || product.title.toLowerCase().includes(name.toLowerCase())) &&
-      (!origin || product.origin.toLowerCase().includes(origin.toLowerCase())) &&
-      (!size || product.size.toLowerCase().includes(size.toLowerCase())) &&
-      (!type || product.type.toLowerCase().includes(type.toLowerCase()))
-    )
-    .map(({ title, image, price, origin, size, type }) => 
-      new Product(title, image, price, origin, size, type)
-    );
-  return products;
+    // Use findAll with the constructed where clause
+    const products = await Product.findAll({
+      where: whereClause,
+    });
+
+    return products;
+  } catch (error) {
+    throw new Error(`Error fetching filtered products: ${error.message}`);
+  }
 }
+
 
 module.exports = {
   getAllProducts,

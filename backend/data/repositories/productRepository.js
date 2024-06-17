@@ -1,15 +1,13 @@
 // data/repositories/productRepository.js
 
-const pool = require('../../config/db');
+const Product = require('../../models/products');
 
-// Repository method to fetch all products
 async function getAll() {
-  const client = await pool.connect();
   try {
-    const res = await client.query('SELECT * FROM products');
-    return res.rows;
-  } finally {
-    client.release();
+    const products = await Product.findAll();
+    return products;
+  } catch (error) {
+    throw new Error(`Error fetching all products: ${error.message}`);
   }
 }
 
