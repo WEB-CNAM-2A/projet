@@ -6,32 +6,37 @@ const userRepository = require('../data/repositories/userRepository');
 
 async function login(login, password) {
     const user = await userRepository.findByLogin(login);
+
+    if (!user) {
+        throw new Error('Invalid login or password');
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    if (!user || !isPasswordValid) {
+    if (!isPasswordValid) {
         const error = new Error('Invalid login or password');
         error.status = 401;
         throw error;
     }
 
     const token = jwt.sign({ userId: user.id }, 'your-secret-key', { expiresIn: '1h' });
-    return { token }; // Return token with success status code
+    return { token };
 }
 
 async function register(nom, prenom, adresse, ville, codePostal, telephone, email, civilite, login, password, pays) {
-    const existingLogin = await userRepository.findByLogin(login);
-    const existingEmail = await userRepository.findByEmail(email);
-    if (existingLogin) {
+      const existingLogin = await userRepository.findByLogin(login);
+      const existingEmail = await userRepository.findByEmail(email);
+      if (existingLogin) {
         throw new Error('Login is already taken');
-    }
-    if (existingEmail) {
+      }
+      if (existingEmail) {
         throw new Error('Email is already taken');
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
+      }
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await userRepository.create(nom, prenom, adresse, ville, codePostal, telephone, email, civilite, login, hashedPassword, pays);
     return { newUser }; // Return token with success status code
-}
+  }
 
 async function session(token) {
     const decodedToken = jwt.verify(token, 'your-secret-key');

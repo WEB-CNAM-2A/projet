@@ -1,50 +1,52 @@
 // data/repositories/userRepository.js
 
-const fs = require('fs');
-const path = require('path');
+const User = require('../../models/user');
 
-const usersFilePath = path.join(__dirname, '..', 'users.json');
-
-function getAll() {
-  const usersData = fs.readFileSync(usersFilePath, 'utf-8');
-  return JSON.parse(usersData);
+// Repository method to fetch all users
+async function getAll() {
+  return await User.findAll();
 }
 
-function findByLogin(login) {
-  const users = getAll();
-  return users.find(user => user.login === login);
+// Repository method to find user by login
+async function findByLogin(login) {
+  return await User.findOne({ where: { login } });
 }
 
-function findById(id) {
-  const users = getAll();
-  return users.find(user => user.id === id);
+// Repository method to find user by ID
+async function findById(id) {
+  return await User.findByPk(id);
 }
 
-function findByEmail(email) {
-  const users = getAll();
-  return users.find(user => user.email === email);
+// Repository method to find user by email
+async function findByEmail(email) {
+  return await User.findOne({ where: { email } });
 }
 
-function create(nom, prenom, adresse, ville, codePostal, telephone, email, civilite, login, hashedPassword, pays) {
-  const users = getAll();
-  const newUser = {
-    id: users.length + 1,
-    nom,
-    prenom,
-    adresse,
-    ville,
-    codePostal,
-    telephone,
-    email,
-    civilite,
-    login,
-    password: hashedPassword,
-    pays,
-  };
-  users.push(newUser);
-  fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
-  return newUser;
+// Repository method to create a new user
+async function create(nom, prenom, adresse, ville, codePostal, telephone, email, civilite, login, hashedPassword, pays) {
+  try {
+    const newUser = await User.create({
+      nom,
+      prenom,
+      adresse,
+      ville,
+      codepostal: codePostal,
+      telephone,
+      email,
+      civilite,
+      login,
+      password: hashedPassword,
+      pays
+    });
+    console.log('Created user:', newUser); // Log newUser to check if id is generated
+    return newUser;
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
+  }
 }
+
+
 
 module.exports = {
   getAll,
