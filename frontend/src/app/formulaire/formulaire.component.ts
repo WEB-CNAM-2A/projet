@@ -15,6 +15,10 @@ import { Router } from '@angular/router';
 })
 export class FormulaireComponent {
   constructor(private http: HttpClient, private LoginService: LoginService, private router:Router) { }
+  loggingErrorMessage: string | null = null;
+  registerErrorMessage: string | null = null;
+
+
 
   login(loginData: any) {
     console.log(loginData);
@@ -30,6 +34,7 @@ export class FormulaireComponent {
         error => {
           // Handle login error
           console.error('Login failed', error);
+          this.loggingErrorMessage = 'Login or password is incorrect. Please try again.';
         }
       );
   }
@@ -48,6 +53,7 @@ export class FormulaireComponent {
         error => {
           // Handle register error
           console.error('Register failed', error);
+          this.registerErrorMessage = 'Register failed. Please try again.';
         }
       );
   }

@@ -8,7 +8,9 @@ async function login(login, password) {
     const user = await userRepository.findByLogin(login);
 
     if (!user) {
-        throw new Error('Invalid login or password');
+      const error = new Error('Invalid login or password');
+      error.status = 401;
+      throw error;
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);

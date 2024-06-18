@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Component, Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { Product } from "../../models/product";
 import { environment } from "../../../environments/environment";
