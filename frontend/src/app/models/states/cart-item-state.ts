@@ -25,9 +25,10 @@ export class CartItemState {
   static getListeContacts(state: CartItemStateModel) {
     return state.items;
   }
+
   @Selector()
   static getPrice(state: CartItemStateModel) {
-    return state.items.reduce((acc, item) => acc + (item.price ?? 0), 0);
+    return state.items.reduce((acc, item) => acc + (item.price ? parseFloat(String(item.price)) : 0), 0);
   }
 
   @Action(AddItem)
